@@ -2,6 +2,10 @@ const axios = require("axios");
 const package = require("../../package.json");
 const { mlUrls } = require("../config/config.json");
 
+// Author
+const name = package.author.split(" ")[0];
+const lastname = package.author.split(" ")[1];
+
 exports.find = async (query) => {
   const mlResp = await axios
     .get(`${mlUrls.search}?q=${query.search}`)
@@ -31,8 +35,8 @@ exports.find = async (query) => {
 
       const data = {
         author: {
-          name: package.author.split(" ")[0],
-          lastname: package.author.split(" ")[1],
+          name,
+          lastname,
         },
         categories,
         items,
@@ -57,11 +61,65 @@ exports.find = async (query) => {
 };
 
 exports.findOne = async (params) => {
+  const getItemDetail = await axios
+    .get(`${mlUrls.find}${params.id}`)
+    .then(async (resp) => {
+      let item = [];
+      const product = resp.data;
+
+      item.push({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        picture: product.thumbnail,
+        condition: product.condition,
+        free_shipping: product.shipping.free_shipping,
+        sold_quantity: product.sold_quantity,
+      });
+
+      const descriptionRes = await findDescription(params.id);
+
+      const data = {
+        author: {
+          name,
+          lastname,
+        },
+        item,
+        description: descriptionRes.description,
+      };
+
+      return { data };
+    })
+    .catch((err) => {
+      const msg = "Error obteniendo Items";
+      console.log(msg, err);
+
+      return { msg };
+    });
+
   return {
     data: {
-      find: "Encontrado",
-      params,
+      data: getItemDetail.data,
     },
-    code: 200,
+    code: getItemDetail ? 200 : 400,
+  };
+};
+
+const findDescription = async (itemId) => {
+  const mlDescription = await axios
+    .get(`${mlUrls.find}${itemId}/description`)
+    .then((resp) => {
+      const description = resp.data.plain_text;
+      console.log("respuesta servicio", resp.data.plain_text);
+      return description || "";
+    })
+    .catch((err) => {
+      const msg = "Error obteniendo la descripción";
+      console.log(msg, err);
+      return "";
+    });
+
+  return {
+    description: mlDescription,
   };
 };
