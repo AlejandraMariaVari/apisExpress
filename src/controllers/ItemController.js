@@ -110,7 +110,6 @@ const findDescription = async (itemId) => {
     .get(`${mlUrls.find}${itemId}/description`)
     .then((resp) => {
       const description = resp.data.plain_text;
-      console.log("respuesta servicio", resp.data.plain_text);
       return description || "";
     })
     .catch((err) => {
