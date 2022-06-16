@@ -1,7 +1,11 @@
 const express = require("express");
+var cors = require("cors");
 const app = express();
 const morgan = require("morgan");
 const item = require("./routes/item");
+
+// Use of cors
+app.use(cors());
 
 // Settings
 app.set("port", process.env.PORT || 4000);
@@ -16,6 +20,6 @@ app.use(express.json());
 app.use("/api/items", item);
 
 // Server initialization
-app.listen(app.get("port"), () => {
-  console.log(`Server listening on port ${app.get("port")}`);
+app.listen(4000, function () {
+  console.log("CORS-enabled web server listening on port 4000");
 });
