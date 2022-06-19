@@ -30,6 +30,7 @@ exports.find = async (query) => {
           picture: item.thumbnail,
           condition: item.condition,
           free_shipping: item.shipping.free_shipping,
+          city: item.address.city_name,
         });
       }
 
