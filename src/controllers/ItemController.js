@@ -68,6 +68,8 @@ exports.findOne = async (params) => {
       let item = [];
       const product = resp.data;
 
+      const descriptionRes = await findDescription(params.id);
+
       item.push({
         id: product.id,
         title: product.title,
@@ -76,9 +78,8 @@ exports.findOne = async (params) => {
         condition: product.condition,
         free_shipping: product.shipping.free_shipping,
         sold_quantity: product.sold_quantity,
+        description: descriptionRes.description,
       });
-
-      const descriptionRes = await findDescription(params.id);
 
       const data = {
         author: {
@@ -86,7 +87,6 @@ exports.findOne = async (params) => {
           lastname,
         },
         item,
-        description: descriptionRes.description,
       };
 
       return { data };
