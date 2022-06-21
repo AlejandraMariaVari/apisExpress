@@ -12,12 +12,21 @@ exports.find = async (query) => {
     .then((resp) => {
       let categories = [];
       let items = [];
+      let filterCategories = resp.data?.filters ?? [];
+
+      if (filterCategories.length > 0) {
+        filterCategories.map((obj) => {
+          if (obj.id == "category" && obj?.values) {
+            obj.values.map((value) => {
+              value.path_from_root.map((pathName) =>
+                categories.push(pathName.name)
+              );
+            });
+          }
+        });
+      }
 
       for (const item of resp.data.results) {
-        if (categories.indexOf(item.category_id) < 0) {
-          categories.push(item.category_id);
-        }
-
         items.push({
           id: item.id,
           title: item.title,
